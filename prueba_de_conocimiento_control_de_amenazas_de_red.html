@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Conocimiento — Control de Amenazas de Red</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            900: '#0a0f1d',
+                            800: '#111827',
+                            700: '#1f293d',
+                            600: '#374151',
+                            accent: '#06b6d4',
+                            success: '#10b981',
+                            warning: '#f59e0b',
+                            danger: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col selection:bg-cyan-500 selection:text-black">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm sm:text-base tracking-wide text-white">CyberOps Control</h1>
+                    <p class="text-xs text-cyan-400">Evaluación de Control de Amenazas de Red</p>
+                </div>
+            </div>
+            
+            <div id="header-stats" class="hidden flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+                    <i class="fa-solid fa-clock text-cyan-400"></i>
+                    <span id="timer-display" class="font-mono font-medium">00:00:00</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+                    <i class="fa-solid fa-tasks text-emerald-400"></i>
+                    <span id="progress-text">Progreso: 0%</span>
+                </div>
+                <button onclick="confirmReset()" class="text-xs bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> Reiniciar
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar Line -->
+        <div id="progress-container" class="hidden absolute bottom-0 left-0 w-full h-1 bg-slate-800">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 overflow-y-auto">
+
+        <!-- SCREEN 1: Welcome Screen -->
+        <div id="screen-welcome" class="max-w-2xl mx-auto my-12 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden backdrop-blur">
+            <div class="absolute -right-20 -top-20 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-4">
+                    <i class="fa-solid fa-shield-cat text-3xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Prueba de Conocimiento</h2>
+                <p class="text-cyan-400 font-medium">Control de amenazas de red</p>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4 sm:p-6 mb-8 text-slate-300 text-sm space-y-3">
+                <p class="font-semibold text-white flex items-center">
+                    <i class="fa-solid fa-circle-info text-cyan-400 mr-2"></i> Instrucciones de la evaluación:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-slate-300 pl-1">
+                    <li>Responde razonando el propósito, funcionamiento y aplicación de cada tema.</li>
+                    <li>La prueba consta de <span class="text-cyan-400 font-bold">5 secciones</span>: Selección múltiple, Verdadero/Falso, Pareo de conceptos, Preguntas de desarrollo y un Caso integrador.</li>
+                    <li>Las preguntas de selección, V/F y pareo se <span class="text-emerald-400 font-bold">calificarán automáticamente</span> al finalizar.</li>
+                    <li>Las preguntas abiertas de desarrollo y caso integrador cuentan con botones para verificar sugerencias basadas en la pauta oficial.</li>
+                    <li>Dispones de un temporizador y barra de progreso para seguir tu avance.</li>
+                </ul>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                    <i class="fa-solid fa-bolt text-amber-400"></i>
+                    <span>Modo interactivo con retroalimentación inmediata</span>
+                </div>
+                <button onclick="startExam()" class="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-cyan-500/25 transition transform active:scale-95 flex items-center justify-center space-x-2">
+                    <span>Comenzar Prueba</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Exam Interface -->
+        <div id="screen-exam" class="hidden space-y-8 pb-16">
+            
+            <!-- Quick Navigation bar / Section jump -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-wrap gap-2 justify-center text-xs sticky top-16 z-40 backdrop-blur">
+                <button onclick="scrollToSection('sec-1')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">1. Selección</button>
+                <button onclick="scrollToSection('sec-2')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">2. Verdad/Falso</button>
+                <button onclick="scrollToSection('sec-3')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">3. Pareo</button>
+                <button onclick="scrollToSection('sec-4')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">4. Desarrollo</button>
+                <button onclick="scrollToSection('sec-5')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">5. Caso Integrador</button>
+            </div>
+
+            <!-- SECTION 1 -->
+            <section id="sec-1" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Sección 1</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Selección Múltiple (Preguntas 1 - 10)</h3>
+                    <p class="text-sm text-slate-400 mt-1">Selecciona la alternativa correcta para cada planteamiento.</p>
+                </div>
+                
+                <div id="questions-sec-1" class="space-y-6">
+                    <!-- Dynamic injection via JS -->
+                </div>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section id="sec-2" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Sección 2</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Verdadero o Falso (Preguntas 11 - 20)</h3>
+                    <p class="text-sm text-slate-400 mt-1">Indica si la afirmación es verdadera o falsa. Si es falsa, justifica brevemente.</p>
+                </div>
+
+                <div id="questions-sec-2" class="space-y-6">
+                    <!-- Dynamic injection via JS -->
+                </div>
+            </section>
+
+            <!-- SECTION 3 -->
+            <section id="sec-3" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Sección 3</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Pareo de Conceptos (Preguntas 21 - 28)</h3>
+                    <p class="text-sm text-slate-400 mt-1">Relaciona cada concepto numérico con su respectiva descripción usando el selector.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h4 class="text-xs font-bold uppercase text-cyan-400 tracking-wider">Descripciones Disponibles (A - H)</h4>
+                        <div id="matching-descriptions" class="text-xs space-y-1.5 text-slate-300 font-mono">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                    <div id="questions-sec-3" class="space-y-3">
+                        <!-- Dynamic dropdowns -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4 -->
+            <section id="sec-4" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Sección 4</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Preguntas de Desarrollo (Preguntas 29 - 38)</h3>
+                    <p class="text-sm text-slate-400 mt-1">Escribe tu respuesta argumentada. Puedes consultar la sugerencia de la pauta oficial en cualquier momento.</p>
+                </div>
+
+                <div id="questions-sec-4" class="space-y-6">
+                    <!-- Dynamic injection via JS -->
+                </div>
+            </section>
+
+            <!-- SECTION 5 -->
+            <section id="sec-5" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">Sección 5</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Caso Integrador (Pregunta 39)</h3>
+                    <p class="text-sm text-slate-400 mt-1">Responde a cada subpregunta (a-f) considerando el escenario organizacional planteado.</p>
+                </div>
+
+                <div class="bg-slate-950/60 p-4 sm:p-5 rounded-xl border border-slate-800 text-sm text-slate-300 mb-6">
+                    <p class="font-semibold text-white mb-2"><i class="fa-solid fa-building-shield text-cyan-400 mr-2"></i> Escenario del Caso:</p>
+                    <p>Una organización tiene un servidor Linux que ofrece servicios internos y además actúa como punto de paso entre dos redes. Se han detectado intentos de acceso no autorizados, tráfico anormal hacia internet y necesidad de conservar registros para análisis posterior.</p>
+                </div>
+
+                <div id="questions-sec-5" class="space-y-6">
+                    <!-- Dynamic injection via JS -->
+                </div>
+            </section>
+
+            <!-- Submit Action Bar -->
+            <div class="sticky bottom-4 z-40 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-4 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-slate-300 flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-question text-cyan-400"></i>
+                    <span>Verifica tus respuestas antes de enviar la prueba para obtener tu calificación detallada.</span>
+                </div>
+                <button onclick="submitExam()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-slate-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-emerald-500/25 transition transform active:scale-95 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-square-check"></i>
+                    <span>Calificar / Finalizar Prueba</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- SCREEN 3: Results Modal / Screen -->
+        <div id="screen-results" class="hidden max-w-3xl mx-auto my-8 bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-10 shadow-2xl space-y-8">
+            <div class="text-center space-y-3">
+                <div id="result-badge-icon" class="inline-flex p-4 rounded-3xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-2 text-4xl">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Resultados de la Evaluación</h2>
+                <p id="result-subtitle" class="text-slate-400">Evaluación de Control de Amenazas de Red completada con éxito.</p>
+            </div>
+
+            <!-- Score Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calificación Total</p>
+                    <p id="res-score-number" class="text-3xl font-bold text-cyan-400">0 / 28</p>
+                    <p id="res-percentage" class="text-xs text-slate-500 mt-1">0%</p>
+                </div>
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Aciertos Objetivos</p>
+                    <p id="res-correct-count" class="text-3xl font-bold text-emerald-400">0</p>
+                    <p class="text-xs text-slate-500 mt-1">Secciones 1, 2 y 3</p>
+                </div>
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Estado</p>
+                    <p id="res-status-text" class="text-xl font-bold text-amber-400 mt-1">Revisado</p>
+                    <p class="text-xs text-slate-500 mt-1">Desarrollo disponible abajo</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-2">Desglose de Preguntas Objetivas (1 al 28)</h3>
+                <div id="detailed-feedback-list" class="space-y-2 max-h-96 overflow-y-auto pr-2">
+                    <!-- Dynamic injection -->
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4 border-t border-slate-800">
+                <button onclick="reviewAnswers()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Ver mis respuestas y sugerencias</span>
+                </button>
+                <button onclick="confirmReset()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Intentar de nuevo</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Notification / Alert Box (Custom to avoid alert() rule) -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center space-x-3 text-cyan-400">
+                <i id="modal-icon" class="fa-solid fa-circle-exclamation text-2xl"></i>
+                <h3 id="modal-title" class="font-bold text-lg text-white">Aviso</h3>
+            </div>
+            <p id="modal-message" class="text-slate-300 text-sm"></p>
+            <div id="modal-actions" class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeModal()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-5 py-2 rounded-xl text-sm transition">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900/50 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>CyberOps Threat Control Exam — Basado en ME_3-CYBEROPS.pdf</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Data structure for the exam questions and answers
+        const examData = {
+            sec1: [
+                {
+                    id: 1,
+                    question: "Un firewall se caracteriza principalmente por:",
+                    options: [
+                        { key: "a", text: "Aumentar la velocidad de la red." },
+                        { key: "b", text: "Ser el punto por donde circula el tráfico y aplicar una política de control de acceso." },
+                        { key: "c", text: "Reemplazar todos los antivirus de la organización." },
+                        { key: "d", text: "Eliminar automáticamente todas las vulnerabilidades del sistema operativo." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 2,
+                    question: "¿Cuál es la diferencia esencial entre un firewall de filtrado de paquetes y uno con estado?",
+                    options: [
+                        { key: "a", text: "El primero analiza aplicaciones; el segundo solo direcciones IP." },
+                        { key: "b", text: "El primero decide paquete por paquete; el segundo considera el contexto y estado de la conexión." },
+                        { key: "c", text: "El primero funciona solo en Linux; el segundo solo en routers." },
+                        { key: "d", text: "No existe diferencia relevante." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 3,
+                    question: "iptables permite controlar tráfico que:",
+                    options: [
+                        { key: "a", text: "Solo entra al equipo." },
+                        { key: "b", text: "Solo sale del equipo." },
+                        { key: "c", text: "Entra, sale o atraviesa el equipo." },
+                        { key: "d", text: "Solo viaja entre dos servidores externos." }
+                    ],
+                    correct: "c"
+                },
+                {
+                    id: 4,
+                    question: "Para filtrar tráfico IP en iptables, el documento asocia principalmente las cadenas:",
+                    options: [
+                        { key: "a", text: "PREROUTING, POSTROUTING y FORWARD." },
+                        { key: "b", text: "INPUT, OUTPUT y FORWARD." },
+                        { key: "c", text: "INPUT, PREROUTING y POSTROUTING." },
+                        { key: "d", text: "OUTPUT, POSTROUTING y MANGLE." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 5,
+                    question: "¿Cuál es la función principal de NetFlow?",
+                    options: [
+                        { key: "a", text: "Administrar contraseñas de usuarios." },
+                        { key: "b", text: "Proporcionar estadísticas sobre los paquetes IP que atraviesan dispositivos de red." },
+                        { key: "c", text: "Cifrar los datos almacenados en un servidor." },
+                        { key: "d", text: "Bloquear automáticamente ataques de ingeniería social." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 6,
+                    question: "En SNMP, la MIB corresponde a:",
+                    options: [
+                        { key: "a", text: "El software que ejecuta el administrador." },
+                        { key: "b", text: "La base de información del agente donde se guardan datos y estadísticas del dispositivo." },
+                        { key: "c", text: "El servidor que bloquea tráfico malicioso." },
+                        { key: "d", text: "Una regla de iptables." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 7,
+                    question: "La principal ventaja de Syslog es:",
+                    options: [
+                        { key: "a", text: "Cifrar el tráfico de red." },
+                        { key: "b", text: "Enviar y centralizar mensajes del sistema desde dispositivos de red hacia un servidor." },
+                        { key: "c", text: "Sustituir al firewall con estado." },
+                        { key: "d", text: "Detectar virus en archivos ejecutables." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 8,
+                    question: "Un HIPS se caracteriza por:",
+                    options: [
+                        { key: "a", text: "Proteger la red completa desde un dispositivo central." },
+                        { key: "b", text: "Instalarse en un host individual y monitorear actividades sospechosas del sistema." },
+                        { key: "c", text: "Analizar únicamente tráfico de capa 3." },
+                        { key: "d", text: "Reemplazar el uso de firewall." }
+                    ],
+                    correct: "b"
+                },
+                {
+                    id: 9,
+                    question: "¿Cuál es la diferencia entre DoS y DDoS?",
+                    options: [
+                        { key: "a", text: "DoS usa múltiples equipos; DDoS usa uno solo." },
+                        { key: "b", text: "DoS afecta la confidencialidad; DDoS afecta la integridad." },
+                        { key: "c", text: "DoS proviene de una fuente; DDoS utiliza múltiples hosts comprometidos distribuidos." },
+                        { key: "d", text: "Son el mismo tipo de ataque." }
+                    ],
+                    correct: "c"
+                },
+                {
+                    id: 10,
+                    question: "Un troyano se diferencia de un gusano porque:",
+                    options: [
+                        { key: "a", text: "El troyano se propaga automáticamente por la red." },
+                        { key: "b", text: "El troyano aparenta ser legítimo, pero contiene código malicioso." },
+                        { key: "c", text: "El gusano requiere siempre intervención humana." },
+                        { key: "d", text: "El troyano solo afecta archivos de texto." }
+                    ],
+                    correct: "b"
+                }
+            ],
+            sec2: [
+                {
+                    id: 11,
+                    statement: "Un firewall por sí solo constituye una defensa completa frente a todas las amenazas.",
+                    correct: false,
+                    explanation: "Falso: el firewall debe complementarse con otros protocolos, sistemas IDS/IPS y respaldos."
+                },
+                {
+                    id: 12,
+                    statement: "Un IDS detecta intrusiones, mientras que un IPS está orientado a la prevención.",
+                    correct: true,
+                    explanation: "Verdadero."
+                },
+                {
+                    id: 13,
+                    statement: "iptables puede utilizarse tanto para filtrado IP como para NAT.",
+                    correct: true,
+                    explanation: "Verdadero."
+                },
+                {
+                    id: 14,
+                    statement: "Un virus puede propagarse sin intervención humana igual que un gusano.",
+                    correct: false,
+                    explanation: "Falso: el virus normalmente requiere ayuda humana (ej. abrir archivo), el gusano se propaga por sí mismo."
+                },
+                {
+                    id: 15,
+                    statement: "El riesgo se define como la probabilidad de que una amenaza aproveche una vulnerabilidad y genere una consecuencia indeseable.",
+                    correct: true,
+                    explanation: "Verdadero."
+                },
+                {
+                    id: 16,
+                    statement: "Transferir el riesgo implica eliminar definitivamente el activo asociado.",
+                    correct: false,
+                    explanation: "Falso: transferir implica que un tercero asuma el riesgo (seguro/SLA); eliminar se asocia a retirar el activo."
+                },
+                {
+                    id: 17,
+                    statement: "Un ataque de reconocimiento busca identificar información, hosts, puertos o vulnerabilidades antes de ejecutar un ataque.",
+                    correct: true,
+                    explanation: "Verdadero."
+                },
+                {
+                    id: 18,
+                    statement: "El phishing por voz se denomina smishing.",
+                    correct: false,
+                    explanation: "Falso: el phishing por voz es vishing; smishing es por SMS."
+                },
+                {
+                    id: 19,
+                    statement: "Un rootkit permanece oculto y proporciona acceso privilegiado al agente de amenaza.",
+                    correct: true,
+                    explanation: "Verdadero."
+                },
+                {
+                    id: 20,
+                    statement: "NetFlow, SNMP y Syslog complementan al firewall porque permiten monitorear, administrar y registrar eventos de red.",
+                    correct: true,
+                    explanation: "Verdadero."
+                }
+            ],
+            sec3: {
+                descriptions: [
+                    { key: "A", text: "Base de información del agente SNMP." },
+                    { key: "B", text: "Tecnología que entrega estadísticas de flujos IP." },
+                    { key: "C", text: "Sistema orientado a detectar intrusiones." },
+                    { key: "D", text: "Protocolo para centralizar mensajes del sistema." },
+                    { key: "E", text: "IPS instalado en un host individual." },
+                    { key: "F", text: "Sistema orientado a prevenir intrusiones." },
+                    { key: "G", text: "IPS implementado en la infraestructura de red." },
+                    { key: "H", text: "Protocolo de administración y monitoreo de dispositivos IP." }
+                ],
+                items: [
+                    { id: 21, concept: "IDS", correct: "C" },
+                    { id: 22, concept: "IPS", correct: "F" },
+                    { id: 23, concept: "HIPS", correct: "E" },
+                    { id: 24, concept: "NIPS", correct: "G" },
+                    { id: 25, concept: "NetFlow", correct: "B" },
+                    { id: 26, concept: "SNMP", correct: "H" },
+                    { id: 27, concept: "Syslog", correct: "D" },
+                    { id: 28, concept: "MIB", correct: "A" }
+                ]
+            },
+            sec4: [
+                {
+                    id: 29,
+                    title: "29. Funcionamiento del Firewall con Estado",
+                    prompt: "Explica por qué un firewall con estado es más útil que uno de filtrado de paquetes para analizar una conexión completa. Menciona qué información utiliza el firewall con estado.",
+                    suggestion: "El firewall con estado usa tabla de estados, puerto, protocolo y contexto de conexiones anteriores; monitorea desde la apertura hasta el cierre, permitiendo evaluar si un paquete forma parte de una sesión válida previamente establecida, a diferencia del filtrado simple que examina cada paquete de forma aislada."
+                },
+                {
+                    id: 30,
+                    title: "30. Cadenas de iptables en Servidor Linux",
+                    prompt: "Un servidor Linux debe bloquear conexiones entrantes no autorizadas, controlar tráfico que atraviesa hacia otra red y realizar NAT. Indica qué cadenas de iptables utilizarías en cada caso y justifica tu respuesta.",
+                    suggestion: "Entrante: INPUT (para bloquear o filtrar paquetes destinados localmente al propio servidor). Tráfico que atraviesa: FORWARD (para paquetes que entran por una interfaz y salen por otra hacia otra red). NAT: PREROUTING o POSTROUTING (para modificación de direcciones IP/puertos de origen o destino)."
+                },
+                {
+                    id: 31,
+                    title: "31. Relación de Conceptos de Riesgo y Mitigación",
+                    prompt: "Explica la relación entre amenaza, vulnerabilidad, ataque y riesgo. Luego indica una acción para mitigar riesgo y una para transferirlo, según los ejemplos del documento.",
+                    suggestion: "Amenaza es un peligro potencial; vulnerabilidad es una debilidad del sistema; ataque es la acción que explota la vulnerabilidad; riesgo es la probabilidad de que ocurra y genere consecuencia indeseable. Mitigar: implementar o mejorar un control técnico (ej. parche o firewall). Transferir: contratar un seguro o un SLA con terceros."
+                },
+                {
+                    id: 32,
+                    title: "32. Comparativa: Virus, Gusano y Troyano",
+                    prompt: "Compara virus, gusano y troyano considerando: forma de propagación, necesidad de intervención del usuario y consecuencia principal.",
+                    suggestion: "Virus: se inserta en programas legítimos y requiere acción humana para propagarse. Gusano: se replica de forma autónoma aprovechando vulnerabilidades de red sin intervención. Troyano: aparenta ser un software legítimo pero oculta código malicioso para abrir puertas traseras o robar datos."
+                },
+                {
+                    id: 33,
+                    title: "33. Monitoreo de Tráfico Saliente y Troyanos",
+                    prompt: "Explica por qué el documento señala que es necesario monitorear el tráfico saliente frente a la presencia de troyanos.",
+                    suggestion: "Porque un troyano a menudo establece comunicaciones de comando y control (C2) o exfiltra información confidencial hacia servidores externos del ciberdelincuente, por lo que el análisis del tráfico saliente puede revelar indicadores clave de compromiso (IoC)."
+                },
+                {
+                    id: 34,
+                    title: "34. Etapas de un Ataque de Reconocimiento",
+                    prompt: "Describe las etapas de un ataque de reconocimiento y explica por qué esta fase facilita los ataques posteriores.",
+                    suggestion: "Incluye consulta de información pública, barrido de pings (ping sweep), escaneo de puertos y análisis de vulnerabilidades. Facilita ataques posteriores al mapear la superficie de ataque para identificar objetivos activos y debilidades explotables."
+                },
+                {
+                    id: 35,
+                    title: "35. Tipos de Ingeniería Social y Ciberataques",
+                    prompt: "Diferencia spear phishing, whaling, pharming, watering hole, vishing y smishing, explicando el objetivo o mecanismo de cada uno.",
+                    suggestion: "Spear phishing: phishing dirigido a un individuo u organización específica. Whaling: dirigido a altos ejecutivos (directivos). Pharming: redirección maliciosa de tráfico web mediante alteración de DNS/hosts. Watering hole: infección de sitios web frecuentados por la víctima. Vishing: phishing por voz (telefonía). Smishing: phishing mediante mensajes SMS."
+                },
+                {
+                    id: 36,
+                    title: "36. Componentes de un Ataque DDoS",
+                    prompt: "Explica los componentes de un ataque DDoS: zombis, bots, botnet, controladores y botmaster.",
+                    suggestion: "Zombis: sistemas hosts infectados. Bots: el software malicioso instalado que comunica con el controlador. Botnet: la red masiva de zombis coordinados. Controladores: servidores C2 que dirigen la botnet. Botmaster: el atacante o agente que comanda la red."
+                },
+                {
+                    id: 37,
+                    title: "37. Análisis de Incidente en Host y Selección de IPS",
+                    prompt: "Un equipo presenta actividad inusual: cambios no autorizados en el registro, ejecución de programas de instalación y posibles desbordamientos de búfer. ¿Qué tipo de IPS describe mejor esta situación y por qué?",
+                    suggestion: "HIPS (Host-based Intrusion Prevention System), porque monitorea de manera específica el sistema operativo local, procesos, registros y actividades sospechosas directamente dentro del host individual."
+                },
+                {
+                    id: 38,
+                    title: "38. Complementariedad de Herramientas de Red",
+                    prompt: "Explica cómo se complementan iptables, NetFlow, SNMP y Syslog en la protección de una infraestructura de red.",
+                    suggestion: "iptables filtra y controla activamente el tráfico; NetFlow proporciona estadísticas detalladas del flujo de paquetes; SNMP monitorea el estado y rendimiento de los dispositivos de red; Syslog centraliza y almacena los registros de eventos para auditoría y análisis forense."
+                }
+            ],
+            sec5: [
+                {
+                    id: "39a",
+                    title: "a) Cadenas de iptables a utilizar",
+                    prompt: "¿Qué cadenas de iptables usarías para controlar tráfico entrante, saliente y que atraviesa el servidor? Justifica.",
+                    suggestion: "INPUT (para tráfico entrante dirigido al servidor), OUTPUT (para tráfico saliente generado por el servidor), y FORWARD (para el tráfico que atraviesa el servidor entre redes)."
+                },
+                {
+                    id: "39b",
+                    title: "b) Protocolo para análisis de flujos",
+                    prompt: "¿Qué protocolo usarías para analizar los flujos de tráfico y por qué?",
+                    suggestion: "NetFlow, porque permite obtener estadísticas detalladas sobre los flujos IP, volúmenes y patrones de comunicación para detectar anomalías hacia internet."
+                },
+                {
+                    id: "39c",
+                    title: "c) Protocolo para centralización de registros",
+                    prompt: "¿Qué protocolo usarías para centralizar los mensajes del sistema y por qué?",
+                    suggestion: "Syslog, para enviar y centralizar de manera segura los registros de eventos y mensajes del sistema operativo hacia un servidor central."
+                },
+                {
+                    id: "39d",
+                    title: "d) Solución de monitoreo de dispositivos",
+                    prompt: "¿Qué tipo de solución usarías para monitorear el estado y rendimiento de los dispositivos?",
+                    suggestion: "SNMP (Simple Network Management Protocol), para la administración, supervisión de estado y estadísticas de los dispositivos de red."
+                },
+                {
+                    id: "39e",
+                    title: "e) Necesidad de IDS/IPS junto al Firewall",
+                    prompt: "¿Por qué el firewall debe complementarse con IDS/IPS?",
+                    suggestion: "Porque el firewall por sí solo no analiza el contenido profundo de las aplicaciones ni detecta comportamientos maliciosos complejos o ataques avanzados en tiempo real."
+                },
+                {
+                    id: "39f",
+                    title: "f) Identificación de ataque de saturación",
+                    prompt: "Si el ataque consistiera en múltiples equipos comprometidos saturando el servicio, ¿qué tipo de ataque sería y qué componentes lo conforman?",
+                    suggestion: "Sería un ataque DDoS (Denegación de Servicio Distribuida), conformado por zombis (hosts infectados), bots, botnet, servidores controladores C2 y el botmaster."
+                }
+            ]
+        };
+
+        // App state
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let examStarted = false;
+
+        // Initialize UI on load
+        window.onload = function() {
+            renderExamContent();
+        };
+
+        function startExam() {
+            examStarted = true;
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            document.getElementById('header-stats').classList.remove('hidden');
+            document.getElementById('progress-container').classList.remove('hidden');
+            
+            // Start timer
+            secondsElapsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateProgress();
+        }
+
+        function updateTimerDisplay() {
+            const hrs = Math.floor(secondsElapsed / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((secondsElapsed % 3600) / 60).toString().padStart(2, '0');
+            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
+        }
+
+        function scrollToSection(secId) {
+            document.getElementById(secId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderExamContent() {
+            // Section 1: Multiple Choice
+            const s1Container = document.getElementById('questions-sec-1');
+            s1Container.innerHTML = examData.sec1.map((q, idx) => `
+                <div class="bg-slate-950/40 border border-slate-800 p-4 sm:p-5 rounded-xl space-y-3" id="q-card-${q.id}">
+                    <p class="font-medium text-sm sm:text-base text-white"><span class="text-cyan-400 font-bold mr-2">${q.id}.</span>${q.question}</p>
+                    <div class="grid grid-cols-1 gap-2 pl-4">
+                        ${q.options.map(opt => `
+                            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-slate-800/60 cursor-pointer transition border border-transparent hover:border-slate-700">
+                                <input type="radio" name="q_${q.id}" value="${opt.key}" onchange="updateProgress()" class="mt-1 text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+                                <span class="text-xs sm:text-sm text-slate-300"><strong class="text-cyan-400 mr-1 uppercase">${opt.key})</strong> ${opt.text}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-q-${q.id}" class="hidden text-xs px-3 py-2 rounded-lg mt-2"></div>
+                </div>
+            `).join('');
+
+            // Section 2: True / False
+            const s2Container = document.getElementById('questions-sec-2');
+            s2Container.innerHTML = examData.sec2.map((q, idx) => `
+                <div class="bg-slate-950/40 border border-slate-800 p-4 sm:p-5 rounded-xl space-y-3" id="q-card-${q.id}">
+                    <p class="font-medium text-sm sm:text-base text-white"><span class="text-cyan-400 font-bold mr-2">${q.id}.</span>${q.statement}</p>
+                    <div class="flex flex-wrap items-center gap-4 pl-2">
+                        <label class="flex items-center space-x-2 bg-slate-900 px-4 py-2 rounded-lg border border-slate-800 cursor-pointer hover:border-cyan-500 transition">
+                            <input type="radio" name="q_${q.id}" value="true" onchange="updateProgress()" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+                            <span class="text-sm font-medium text-slate-200">Verdadero</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-slate-900 px-4 py-2 rounded-lg border border-slate-800 cursor-pointer hover:border-cyan-500 transition">
+                            <input type="radio" name="q_${q.id}" value="false" onchange="updateProgress()" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+                            <span class="text-sm font-medium text-slate-200">Falso</span>
+                        </label>
+                    </div>
+                    <div class="pl-2 pt-1">
+                        <input type="text" id="justification_${q.id}" placeholder="Justificación breve (obligatorio si es falso según pauta)..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div id="feedback-q-${q.id}" class="hidden text-xs px-3 py-2 rounded-lg mt-2"></div>
+                </div>
+            `).join('');
+
+            // Section 3: Matching
+            const s3DescContainer = document.getElementById('matching-descriptions');
+            s3DescContainer.innerHTML = examData.sec3.descriptions.map(d => `
+                <div class="flex items-start space-x-2">
+                    <span class="font-bold text-cyan-400">${d.key}.</span>
+                    <span>${d.text}</span>
+                </div>
+            `).join('');
+
+            const s3Container = document.getElementById('questions-sec-3');
+            s3Container.innerHTML = examData.sec3.items.map(item => `
+                <div class="bg-slate-950/40 border border-slate-800 p-3 rounded-xl flex items-center justify-between gap-4" id="q-card-${item.id}">
+                    <div class="text-sm font-medium text-white flex items-center space-x-2">
+                        <span class="text-cyan-400 font-bold">${item.id}.</span>
+                        <span>${item.concept}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="match_${item.id}" onchange="updateProgress()" class="bg-slate-900 border border-slate-700 text-cyan-400 font-bold text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500">
+                            <option value="">Seleccione...</option>
+                            ${examData.sec3.descriptions.map(d => `<option value="${d.key}">${d.key}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div id="feedback-q-${item.id}" class="hidden text-xs px-3 py-1 rounded-lg"></div>
+            `).join('');
+
+            // Section 4: Development
+            const s4Container = document.getElementById('questions-sec-4');
+            s4Container.innerHTML = examData.sec4.map(q => `
+                <div class="bg-slate-950/40 border border-slate-800 p-4 sm:p-5 rounded-xl space-y-3">
+                    <h4 class="font-bold text-sm sm:text-base text-white">${q.title}</h4>
+                    <p class="text-xs sm:text-sm text-slate-300">${q.prompt}</p>
+                    <textarea rows="3" placeholder="Escribe tu razonamiento aquí..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-500 transition"></textarea>
+                    <div class="flex justify-between items-center pt-1">
+                        <button onclick="toggleSuggestion('sug-4-${q.id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span>Ver sugerencia pauta</span>
+                        </button>
+                    </div>
+                    <div id="sug-4-${q.id}" class="hidden bg-cyan-950/30 border border-cyan-500/30 p-3 rounded-xl text-xs text-cyan-200 space-y-1">
+                        <p class="font-bold"><i class="fa-solid fa-check-circle mr-1 text-cyan-400"></i> Sugerencia oficial:</p>
+                        <p>${q.suggestion}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Section 5: Case Study
+            const s5Container = document.getElementById('questions-sec-5');
+            s5Container.innerHTML = examData.sec5.map(q => `
+                <div class="bg-slate-950/40 border border-slate-800 p-4 sm:p-5 rounded-xl space-y-3">
+                    <h4 class="font-bold text-sm sm:text-base text-white">${q.title}</h4>
+                    <p class="text-xs sm:text-sm text-slate-300">${q.prompt}</p>
+                    <textarea rows="3" placeholder="Escribe tu respuesta..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-500 transition"></textarea>
+                    <div class="flex justify-between items-center pt-1">
+                        <button onclick="toggleSuggestion('sug-5-${q.id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span>Ver sugerencia pauta</span>
+                        </button>
+                    </div>
+                    <div id="sug-5-${q.id}" class="hidden bg-cyan-950/30 border border-cyan-500/30 p-3 rounded-xl text-xs text-cyan-200 space-y-1">
+                        <p class="font-bold"><i class="fa-solid fa-check-circle mr-1 text-cyan-400"></i> Sugerencia oficial:</p>
+                        <p>${q.suggestion}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleSuggestion(elemId) {
+            const el = document.getElementById(elemId);
+            el.classList.toggle('hidden');
+        }
+
+        function updateProgress() {
+            let totalAnswered = 0;
+            const totalQuestions = 10 + 10 + 8; // Sec 1, 2, 3
+
+            // Check Sec 1
+            examData.sec1.forEach(q => {
+                const radios = document.getElementsByName(`q_${q.id}`);
+                for (let r of radios) {
+                    if (r.checked) { totalAnswered++; break; }
+                }
+            });
+
+            // Check Sec 2
+            examData.sec2.forEach(q => {
+                const radios = document.getElementsByName(`q_${q.id}`);
+                for (let r of radios) {
+                    if (r.checked) { totalAnswered++; break; }
+                }
+            });
+
+            // Check Sec 3
+            examData.sec3.items.forEach(item => {
+                const sel = document.getElementById(`match_${item.id}`);
+                if (sel && sel.value !== "") { totalAnswered++; }
+            });
+
+            const percent = Math.round((totalAnswered / totalQuestions) * 100);
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `Progreso: ${percent}%`;
+        }
+
+        function submitExam() {
+            let correctCount = 0;
+            const totalObjective = 28;
+            let detailedHTML = "";
+
+            // Evaluate Section 1 (1-10)
+            examData.sec1.forEach(q => {
+                const radios = document.getElementsByName(`q_${q.id}`);
+                let userVal = null;
+                for (let r of radios) {
+                    if (r.checked) { userVal = r.value; break; }
+                }
+                const isCorrect = userVal === q.correct;
+                if (isCorrect) correctCount++;
+
+                const card = document.getElementById(`q-card-${q.id}`);
+                const fb = document.getElementById(`feedback-q-${q.id}`);
+                fb.classList.remove('hidden');
+                if (isCorrect) {
+                    card.classList.add('border-emerald-500/50', 'bg-emerald-950/10');
+                    card.classList.remove('border-red-500/50', 'bg-red-950/10');
+                    fb.className = "text-xs px-3 py-2 rounded-lg mt-2 bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 flex items-center space-x-2";
+                    fb.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i><span>¡Correcto! Opción ${q.correct.toUpperCase()}</span>`;
+                } else {
+                    card.classList.add('border-red-500/50', 'bg-red-950/10');
+                    card.classList.remove('border-emerald-500/50', 'bg-emerald-950/10');
+                    fb.className = "text-xs px-3 py-2 rounded-lg mt-2 bg-red-950/50 text-red-300 border border-red-500/30 flex items-center space-x-2";
+                    fb.innerHTML = `<i class="fa-solid fa-xmark text-red-400"></i><span>Incorrecto. La respuesta correcta era: <strong>${q.correct.toUpperCase()}</strong></span>`;
+                }
+
+                detailedHTML += `
+                    <div class="bg-slate-950 p-3 rounded-lg border ${isCorrect ? 'border-emerald-500/30' : 'border-red-500/30'} flex justify-between items-center text-xs">
+                        <span class="text-slate-300">Pregunta ${q.id} (Selección)</span>
+                        <span class="font-bold ${isCorrect ? 'text-emerald-400' : 'text-red-400'}">${isCorrect ? 'Correcta' : 'Incorrecta (Correcta: ' + q.correct.toUpperCase() + ')'}</span>
+                    </div>
+                `;
+            });
+
+            // Evaluate Section 2 (11-20)
+            examData.sec2.forEach(q => {
+                const radios = document.getElementsByName(`q_${q.id}`);
+                let userVal = null;
+                for (let r of radios) {
+                    if (r.checked) { userVal = r.value === 'true'; break; }
+                }
+                const isCorrect = userVal === q.correct;
+                if (isCorrect) correctCount++;
+
+                const card = document.getElementById(`q-card-${q.id}`);
+                const fb = document.getElementById(`feedback-q-${q.id}`);
+                fb.classList.remove('hidden');
+                if (isCorrect) {
+                    card.classList.add('border-emerald-500/50', 'bg-emerald-950/10');
+                    card.classList.remove('border-red-500/50', 'bg-red-950/10');
+                    fb.className = "text-xs px-3 py-2 rounded-lg mt-2 bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 flex items-center space-x-2";
+                    fb.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i><span>¡Correcto! ${q.explanation}</span>`;
+                } else {
+                    card.classList.add('border-red-500/50', 'bg-red-950/10');
+                    card.classList.remove('border-emerald-500/50', 'bg-emerald-950/10');
+                    fb.className = "text-xs px-3 py-2 rounded-lg mt-2 bg-red-950/50 text-red-300 border border-red-500/30 flex items-center space-x-2";
+                    fb.innerHTML = `<i class="fa-solid fa-xmark text-red-400"></i><span>Incorrecto. Era ${q.correct ? 'Verdadero' : 'Falso'}. ${q.explanation}</span>`;
+                }
+
+                detailedHTML += `
+                    <div class="bg-slate-950 p-3 rounded-lg border ${isCorrect ? 'border-emerald-500/30' : 'border-red-500/30'} flex justify-between items-center text-xs">
+                        <span class="text-slate-300">Pregunta ${q.id} (V/F)</span>
+                        <span class="font-bold ${isCorrect ? 'text-emerald-400' : 'text-red-400'}">${isCorrect ? 'Correcta' : 'Incorrecta'}</span>
+                    </div>
+                `;
+            });
+
+            // Evaluate Section 3 (21-28)
+            examData.sec3.items.forEach(item => {
+                const sel = document.getElementById(`match_${item.id}`);
+                const userVal = sel ? sel.value : "";
+                const isCorrect = userVal === item.correct;
+                if (isCorrect) correctCount++;
+
+                const card = document.getElementById(`q-card-${item.id}`);
+                const fb = document.getElementById(`feedback-q-${item.id}`);
+                fb.classList.remove('hidden');
+                if (isCorrect) {
+                    card.classList.add('border-emerald-500/50', 'bg-emerald-950/10');
+                    card.classList.remove('border-red-500/50', 'bg-red-950/10');
+                    fb.className = "text-xs px-3 py-1 rounded-lg bg-emerald-950/50 text-emerald-300 border border-emerald-500/30";
+                    fb.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Correcto (${item.concept} -> ${item.correct})`;
+                } else {
+                    card.classList.add('border-red-500/50', 'bg-red-950/10');
+                    card.classList.remove('border-emerald-500/50', 'bg-red-950/10');
+                    fb.className = "text-xs px-3 py-1 rounded-lg bg-red-950/50 text-red-300 border border-red-500/30";
+                    fb.innerHTML = `<i class="fa-solid fa-xmark mr-1"></i> Incorrecto. La respuesta era ${item.correct}`;
+                }
+
+                detailedHTML += `
+                    <div class="bg-slate-950 p-3 rounded-lg border ${isCorrect ? 'border-emerald-500/30' : 'border-red-500/30'} flex justify-between items-center text-xs">
+                        <span class="text-slate-300">Pregunta ${item.id} (${item.concept})</span>
+                        <span class="font-bold ${isCorrect ? 'text-emerald-400' : 'text-red-400'}">${isCorrect ? 'Correcta' : 'Incorrecta (Era ' + item.correct + ')'}</span>
+                    </div>
+                `;
+            });
+
+            // Stop timer
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Populate Results UI
+            document.getElementById('res-score-number').innerText = `${correctCount} / ${totalObjective}`;
+            const pct = Math.round((correctCount / totalObjective) * 100);
+            document.getElementById('res-percentage').innerText = `${pct}% de acierto objetivo`;
+            
+            let statusBadge = "Excelente";
+            if (pct < 60) statusBadge = "Requiere Repaso";
+            else if (pct < 85) statusBadge = "Buen Dominio";
+            document.getElementById('res-status-text').innerText = statusBadge;
+            document.getElementById('detailed-feedback-list').innerHTML = detailedHTML;
+
+            // Switch to results screen
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function reviewAnswers() {
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function confirmReset() {
+            showModal("Reiniciar Evaluación", "¿Estás seguro de que deseas reiniciar la prueba? Se perderán todas tus respuestas actuales.", () => {
+                location.reload();
+            });
+        }
+
+        function showModal(title, message, callback = null) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            window.modalCallback = callback;
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            if (window.modalCallback) {
+                window.modalCallback();
+                window.modalCallback = null;
+            }
+        }
+    </script>
+</body>
+</html>
